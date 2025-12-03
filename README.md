@@ -1,107 +1,104 @@
-# 🎮 Flutter Gaming Store App — Workshop Source Code
+# 🎮 Boutique de Jeux — Application Flutter
 
-Welcome!  
-This repository contains the **Flutter codebase** used during my live coding workshops with students.  
-Each session introduces a new concept, and **every commit corresponds to a workshop**, allowing you to follow the progress step-by-step and understand how a full app is built from scratch.
-
----
-
-## 📌 About the Project
-
-Throughout the workshops, we build a **complete gaming store mobile application** (games only).  
-The app is progressively implemented, with each chapter adding new functionality, architecture, or best practices.
-
-This repository aims to:
-
-- Provide the **full source code** for each session  
-- Help students review, rewind and experiment  
-- Demonstrate how real Flutter apps are structured and improved over time  
-- Serve as a reference for best practices in modern Flutter
+Bienvenue !
+Ce dépôt contient le code source d’une application Flutter de boutique de jeux, destinée à l’apprentissage et à la démonstration de bonnes pratiques.
 
 ---
 
-## 🏗 Workshop Structure (Chapters)
+## 📌 À propos du projet
 
-Each chapter corresponds to one or multiple commits.
+L’application présente un catalogue de jeux avec recherche, favoris, panier, détails et bibliothèque. Elle est structurée pour être lisible, évolutive et adaptée aux ateliers pédagogiques.
 
-### 1️⃣ Object-Oriented Programming (OOP)
-- Classes, objects, constructors  
-- Models for the application (Game, Category, User…)  
-- Encapsulation and clean architecture foundations  
+- Objectifs : montrer une architecture Flutter claire, l’intégration API, la gestion d’état, la persistance locale et des tests de base.
+- Plateformes visées : iOS, Android, Web, macOS, Windows, Linux (selon la configuration Flutter).
 
-### 2️⃣ Flutter Widgets
-- Stateless vs Stateful Widgets  
-- Building UI components  
-- Layouts, styling, and reusable components  
+---
 
-### 3️⃣ Navigation
-- Navigator 1.0 & 2.0 (GoRouter optional)  
-- Routing structure for the gaming store  
-- Passing data between screens  
+## 🧩 Fonctionnalités principales
 
-### 4️⃣ HTTP & APIs
-- Fetching game data from a remote API  
-- Showing loading and error states  
-- Parsing JSON into models  
+- Accueil avec liste de jeux et cartes personnalisées.
+- Détails du jeu avec informations et actions.
+- Favoris et bibliothèque (ajout/suppression).
+- Panier avec comptage et gestion simple.
+- Authentification basique (service stub pour démo).
+- Navigation par onglets et barre inférieure.
 
-### 5️⃣ Local Storage
-- SharedPreferences / Hive (depending on workshop)  
-- Storing favorites, cache, or user preferences  
-- Offline data considerations  
+---
 
-### 6️⃣ State Management
-- Provider / Riverpod / Bloc (depending on session)  
-- App-wide reactive state  
-- Clean architecture patterns  
+## 🗂 Structure du projet
 
-### 7️⃣ Unit Tests
-- Testing models  
-- Testing services & business logic  
-- Widget/UI testing  
+Les dossiers clés :
 
+- `lib/` code applicatif Flutter
+	- `Screens/` vues (accueil, détails, panier, bibliothèque, login…)
+	- `Services/` logique (auth, favoris, panier, jeux)
+	- `Models/` modèles (ex. `game.dart` + `game.g.dart`)
+	- `CustomWidgets/` composants UI réutilisables
+	- `main.dart` point d’entrée
+- `assets/` ressources (images, icônes…)
+- `test/` tests widget
 
-## 🧭 How to Use This Repo
+---
 
-1. Clone the repository:
+## 🚀 Démarrage rapide
+
+1. Cloner le dépôt :
 ```bash
-git clone https://github.com/khaledGuedria17/Flutter2526.git
+git clone https://github.com/Majd04bougatef/Flutter2526.git
 ```
-2. Navigate into the project folder
+2. Se placer dans le dossier :
 ```bash
 cd Flutter2526
 ```
-
-3. Install dependencies:
+3. Installer les dépendances :
 ```bash
 flutter pub get
 ```
-
-4. Run the app:
+4. Lancer l’application :
 ```bash
 flutter run
 ```
 
-5. Check out a specific workshop/session using commit history:
+Conseils macOS/iOS : assurez-vous d’avoir Xcode, CocoaPods et un simulateur configuré. Pour le Web, vérifiez `flutter config --enable-web`.
+
+---
+
+## 🧪 Tests
+
+Exécuter les tests widget :
+```bash
+flutter test
+```
+
+---
+
+## 🛠 Technologies
+
+- Flutter 3+ / Dart
+- Widgets personnalisés, navigation, services
+- JSON et générateurs (`build_runner` si utilisé pour `game.g.dart`)
+
+---
+
+## 📖 Ateliers et progression
+
+Chaque série de commits illustre un thème :
+- POO et modèles
+- Widgets et composition
+- Navigation
+- HTTP/API et parsing
+- Persistance locale (SharedPreferences/Hive selon besoin)
+- Gestion d’état (Provider/Riverpod/Bloc selon atelier)
+- Tests unitaires et widget
+
+Pour explorer :
 ```bash
 git log
 git checkout <commit-id>
 ```
+
 ---
 
-## 📚 Purpose & Learning Goals
+## 📬 Contact
 
-By following the repository commits sequentially, students will learn how to:
-
-- Structure a Flutter project professionally
-
-- Build a complete functional application
-
-- Work with backend APIs
-
-- Persist local data
-
-- Use modern state management
-
-- Write clean, maintainable code
-
-- Add unit and widget tests
+Pour questions ou améliorations, ouvrez une issue ou un pull request sur ce dépôt.
