@@ -1,24 +1,63 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/CustomWidgets/custom_button.dart';
 import 'package:myapp/Screens/bottom_nav_screen.dart';
-import 'package:myapp/Screens/home_screen.dart';
+import 'package:myapp/Services/auth_service.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   //route
-  static final String routeName = "/";
-  //var
-  var username = "";
-  var password = "";
-  GlobalKey<FormState> formKey = GlobalKey();
+  static const String routeName = "/";
 
-  LoginScreen({super.key});
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  //var
+  var email = "";
+  var password = "";
+  bool isLoading = false;
+  bool obscurePassword = true;
+  GlobalKey<FormState> formKey = GlobalKey();
+  final AuthService _authService = AuthService();
+
+  Future<void> _handleLogin() async {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
+
+      setState(() {
+        isLoading = true;
+      });
+
+      final result = await _authService.login(email, password);
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (result['success']) {
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, BottomNavScreen.routeName);
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message']),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "S'authentifier",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
@@ -35,27 +74,42 @@ class LoginScreen extends StatelessWidget {
               Image.asset("assets/minecraft.jpg"),
               //2
               TextFormField(
-                decoration: InputDecoration(hint: Text("Username")),
+                decoration: const InputDecoration(hintText: "Email"),
+                keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Username shopuld not be empty';
+                    return 'Email should not be empty';
                   }
+                  if (!value.contains('@')) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
                 },
                 onSaved: (value) {
-                  username = value!;
+                  email = value!;
                 },
               ),
               //3
               TextFormField(
-                obscureText: true,
+                obscureText: obscurePassword,
                 decoration: InputDecoration(
-                  hint: Text("Password"),
-                  suffixIcon: Icon(Icons.visibility),
+                  hintText: "Password",
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscurePassword ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        obscurePassword = !obscurePassword;
+                      });
+                    },
+                  ),
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Password shopuld not be empty';
+                    return 'Password should not be empty';
                   }
+                  return null;
                 },
                 onSaved: (value) {
                   password = value!;
@@ -63,21 +117,16 @@ class LoginScreen extends StatelessWidget {
               ),
               //4 : button
               InkWell(
-                onTap: () {
-                  if (formKey.currentState!.validate()) {
-                    formKey.currentState!.save();
-                    //print(username + " : " + password);
-                    Navigator.pushReplacementNamed(
-                      context,
-                      BottomNavScreen.routeName,
-                    );
-                  }
-                },
-                child: CustomButton("S'authentifier", Colors.deepPurpleAccent),
+                onTap: isLoading ? null : _handleLogin,
+                child: isLoading
+                    ? const CircularProgressIndicator(
+                        color: Colors.deepPurpleAccent,
+                      )
+                    : CustomButton("S'authentifier", Colors.deepPurpleAccent),
               ),
               CustomButton("Créer un compte", Colors.red),
               //5
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 15,
                 children: [
