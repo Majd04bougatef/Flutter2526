@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/CustomWidgets/custom_library_card.dart';
 import 'package:myapp/Models/game.dart';
-import 'package:myapp/Services/game_service.dart';
+import 'package:myapp/Services/favorite_service.dart';
 
 class LibraryScreen extends StatefulWidget {
-  static final String routeName = "/Library";
+  static const String routeName = "/Library";
 
   const LibraryScreen({super.key});
 
@@ -13,19 +13,26 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class _LibraryScreenState extends State<LibraryScreen> {
-  final GameService _gameService = GameService();
-  late Future<List<Game>> _gamesFuture;
+  final FavoriteService _favoriteService = FavoriteService();
+  List<Game> _favorites = [];
 
   @override
   void initState() {
     super.initState();
-    _gamesFuture = _gameService.fetchGames();
+    _loadFavorites();
   }
 
-  void _retry() {
+  void _loadFavorites() {
     setState(() {
-      _gamesFuture = _gameService.fetchGames();
+      _favorites = _favoriteService.getAllFavorites();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reload favorites when screen becomes visible
+    _loadFavorites();
   }
 
   @override
@@ -33,46 +40,36 @@ class _LibraryScreenState extends State<LibraryScreen> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: FutureBuilder<List<Game>>(
-          future: _gamesFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (snapshot.hasError) {
-              return Center(
+        child: _favorites.isEmpty
+            ? const Center(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Failed to load library.'),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: _retry,
-                      child: const Text('Try again'),
+                    Icon(Icons.favorite_border, size: 80, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text(
+                      'No favorites yet',
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Tap the heart icon on a game to add it',
+                      style: TextStyle(color: Colors.grey),
                     ),
                   ],
                 ),
-              );
-            }
-
-            final games = snapshot.data ?? const <Game>[];
-            if (games.isEmpty) {
-              return const Center(child: Text('No games available.'));
-            }
-
-            return GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.8,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+              )
+            : GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.8,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: _favorites.length,
+                itemBuilder: (context, index) =>
+                    CustomLibraryCard(_favorites[index]),
               ),
-              itemCount: games.length,
-              itemBuilder: (context, index) => CustomLibraryCard(games[index]),
-            );
-          },
-        ),
       ),
     );
   }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/Models/game.dart';
+import 'package:myapp/Services/favorite_service.dart';
+import 'package:myapp/Services/cart_service.dart';
 
 class DetailsScreen extends StatefulWidget {
   //routes
-  static final String routeName = "/Details";
+  static const String routeName = "/Details";
   //var
   var counter = 3000;
   late Game currentGame;
@@ -14,6 +16,45 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
+  final FavoriteService _favoriteService = FavoriteService();
+  final CartService _cartService = CartService();
+  bool _isFavorite = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    widget.currentGame = ModalRoute.of(context)!.settings.arguments as Game;
+    _isFavorite = _favoriteService.isFavorite(widget.currentGame);
+  }
+
+  void _toggleFavorite() async {
+    final result = await _favoriteService.toggleFavorite(widget.currentGame);
+    setState(() {
+      _isFavorite = result;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(result ? 'Added to favorites' : 'Removed from favorites'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  void _addToCart() async {
+    await _cartService.addToCart(widget.currentGame);
+    setState(() {
+      widget.counter--;
+    });
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Added to cart'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+
   Widget _buildImage(Game game) {
     if (game.usesNetworkImage) {
       return Image.network(game.image, fit: BoxFit.cover);
@@ -23,16 +64,22 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    widget.currentGame = ModalRoute.of(context)!.settings.arguments as Game;
     final game = widget.currentGame;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          game.name,
-          style: const TextStyle(color: Colors.white),
-        ),
+        title: Text(game.name, style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.deepPurpleAccent,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            onPressed: _toggleFavorite,
+            icon: Icon(
+              _isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: _isFavorite ? Colors.red : Colors.white,
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -50,20 +97,18 @@ class _DetailsScreenState extends State<DetailsScreen> {
               children: [
                 Text(
                   "${game.price} TND",
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text("Nombre d'exemplaire disponible : ${widget.counter}"),
               ],
             ),
             ElevatedButton.icon(
-              //style: ButtonStyle(backgroundColor: Colors.deepPurpleAccent),
-              onPressed: () {
-                setState(() {
-                  widget.counter--;
-                });
-              },
+              onPressed: _addToCart,
               label: const Text("Acheter"),
-              icon: const Icon(Icons.shopping_bag),
+              icon: const Icon(Icons.shopping_cart),
             ),
           ],
         ),
